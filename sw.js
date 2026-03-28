@@ -1,12 +1,11 @@
+const CACHE_NAME = 'cash-manager-v1';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-102.png',
   './icons/icon-192.png',
-  './icons/icon-512.png',
-  './js/chart.js',
-  './js/all.min.js'
+  './icons/icon-512.png'
 ];
 
 // Install
@@ -37,7 +36,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).then(networkResponse => {
-        // Optionally cache new files
         return caches.open(CACHE_NAME).then(cache => {
           cache.put(event.request, networkResponse.clone());
           return networkResponse;
