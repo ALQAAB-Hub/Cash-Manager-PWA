@@ -1,0 +1,3024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cash Manager</title>
+    <link rel="icon" href="./icons/icon-102.png" type="image/png" sizes="102x102">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4361ee">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cash Manager">
+    <link rel="apple-touch-icon" href="./icons/icon-102.png">    
+    <style>
+        /* ===== DESKTOP STYLES (ORIGINAL – UNCHANGED) ===== */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #fca311;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-color: #ddd;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+            --card-gradient: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+        }
+
+        .dark-mode {
+            --primary: #4895ef;
+            --primary-dark: #3a7bd0;
+            --secondary: #9d4edd;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #fca311;
+            --light: #1e1e1e;
+            --dark: #f0f0f0;
+            --gray: #a0a0a0;
+            --light-gray: #0d0d0d;
+            --border-color: #444;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            --card-gradient: linear-gradient(135deg, #3a56d4 0%, #6a0dad 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark);
+            line-height: 1.6;
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 25px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            background: var(--light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            background: var(--card-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle, .reset-btn, .backup-btn, .report-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+        }
+        .reset-btn { background: var(--danger); }
+        .backup-btn { background: var(--success); }
+        .report-btn { background: var(--secondary); }
+        .theme-toggle:hover, .reset-btn:hover, .backup-btn:hover, .report-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+            margin-bottom: 35px;
+        }
+
+        .card {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            transition: var(--transition);
+            border-top: 4px solid var(--primary);
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .income-card .value { color: var(--success); }
+        .expense-card .value { color: var(--danger); }
+        .balance-card .value { color: var(--primary); }
+        .savings-card .value { color: #9d4edd; }
+        .loan-card .value { color: #fca311; }
+        .amanat-card .value { color: #9d4edd; }
+        .online-payments-card .value { color: #34a853; }
+
+        .form-section, .controls, .entries-section, .trash-section, .backup-section, .chart-container {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+        .form-section { border-top: 4px solid var(--secondary); }
+        .entries-section { border-top: 4px solid var(--warning); }
+        .trash-section { border-top: 4px solid var(--danger); }
+        .backup-section { border-top: 4px solid var(--success); }
+
+        .form-section h2, .entries-section h2, .charts-section h2, .trash-section h2, .backup-section h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-group input, .form-group select, .form-group textarea, .search-bar input {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--light-gray);
+            color: var(--dark);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group textarea { min-height: 90px; resize: vertical; font-family: inherit; }
+        .dark-mode .form-group input, .dark-mode .form-group select, .dark-mode .form-group textarea, .dark-mode .search-bar input { background: #2c2c2c; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus, .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--box-shadow);
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .actions { display: flex; justify-content: flex-end; gap: 12px; }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+        }
+        .filters { display: flex; gap: 15px; flex-wrap: wrap; }
+        .search-bar { display: flex; gap: 8px; }
+        .search-bar input { width: 250px; padding: 11px 16px; }
+
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .entries-table th {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--gray);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .entries-table td {
+            padding: 14px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .income-row { background-color: rgba(76, 201, 240, 0.1); border-left: 4px solid var(--success); }
+        .expense-row { background-color: rgba(247, 37, 133, 0.1); border-left: 4px solid var(--danger); }
+        .savings-row { background-color: rgba(157, 78, 221, 0.1); border-left: 4px solid #9d4edd; }
+        .loan-given-row { background-color: rgba(252, 163, 17, 0.1); border-left: 4px solid #fca311; }
+        .loan-taken-row { background-color: rgba(252, 163, 17, 0.15); border-left: 4px solid #e69500; }
+        .amanat-row { background-color: rgba(157, 78, 221, 0.15); border-left: 4px solid #9d4edd; }
+        .online-payments-row { background-color: rgba(52, 168, 83, 0.1); border-left: 4px solid #34a853; }
+        .dark-mode .income-row { background-color: rgba(76, 201, 240, 0.07); }
+        .dark-mode .expense-row { background-color: rgba(247, 37, 133, 0.07); }
+        .dark-mode .savings-row { background-color: rgba(157, 78, 221, 0.07); }
+        .dark-mode .loan-given-row { background-color: rgba(252, 163, 17, 0.07); }
+        .dark-mode .loan-taken-row { background-color: rgba(252, 163, 17, 0.1); }
+        .dark-mode .amanat-row { background-color: rgba(157, 78, 221, 0.1); }
+        .dark-mode .online-payments-row { background-color: rgba(52, 168, 83, 0.1); }
+
+        .action-cell { display: flex; gap: 10px; }
+        .action-btn {
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+        }
+        .edit-btn { background: var(--warning); color: white; }
+        .delete-btn { background: var(--danger); color: white; }
+        .restore-btn { background: var(--success); color: white; }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        .chart-wrapper { position: relative; height: 300px; }
+
+        .trash-toggle {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--box-shadow);
+        }
+        .trash-content { display: none; }
+        .trash-content.show { display: block; }
+
+        .no-data {
+            text-align: center;
+            padding: 35px;
+            color: var(--gray);
+            font-style: italic;
+            background: rgba(0,0,0,0.02);
+            border-radius: var(--border-radius);
+        }
+
+        .entry-category {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .main-category {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background-color: rgba(67, 97, 238, 0.15);
+            color: #4361ee;
+        }
+        .category-salary { background-color: rgba(76, 201, 240, 0.15); color: #4cc9f0; }
+        .category-home-rent { background-color: rgba(114, 9, 183, 0.15); color: #7209b7; }
+        .category-health-medicine { background-color: rgba(67, 97, 238, 0.15); color: #4361ee; }
+        .category-transport-fuel-bus-careem-bike { background-color: rgba(247, 37, 133, 0.15); color: #f72585; }
+        .category-other { background-color: rgba(153, 153, 153, 0.15); color: #999; }
+        .category-zarooriat { background-color: rgba(76, 201, 240, 0.15); color: #4cc9f0; }
+        .category-khwahishat { background-color: rgba(247, 37, 133, 0.15); color: #f72585; }
+        .category-self-growth { background-color: rgba(114, 9, 183, 0.15); color: #7209b7; }
+        .category-business { background-color: rgba(252, 163, 17, 0.15); color: #fca311; }
+        .category-online-payments { background-color: rgba(52, 168, 83, 0.15); color: #34a853; }
+
+        .type-badge {
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .income-badge { background-color: rgba(76, 201, 240, 0.15); color: #4cc9f0; }
+        .expense-badge { background-color: rgba(247, 37, 133, 0.15); color: #f72585; }
+        .savings-badge { background-color: rgba(157, 78, 221, 0.15); color: #9d4edd; }
+        .loan-given-badge { background-color: rgba(252, 163, 17, 0.15); color: #fca311; }
+        .loan-taken-badge { background-color: rgba(252, 163, 17, 0.25); color: #fca311; }
+        .amanat-badge { background-color: rgba(157, 78, 221, 0.25); color: #9d4edd; }
+        .online-payments-badge { background-color: rgba(52, 168, 83, 0.15); color: #34a853; }
+
+        .backup-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .checkbox-cell { width: 35px; text-align: center; }
+        .bulk-actions { display: flex; gap: 12px; margin-bottom: 18px; }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+            gap: 6px;
+        }
+        .pagination-btn {
+            padding: 7px 14px;
+            background-color: var(--light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        .pagination-btn:hover { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .pagination-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        footer {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 25px;
+            margin-top: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        .footer-info h3 { color: white; margin-bottom: 10px; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .footer-info p { color: rgba(255, 255, 255, 0.9); font-size: 0.95rem; line-height: 1.6; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .footer-links { display: flex; flex-direction: column; gap: 20px; }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+        }
+        .social-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .social-links a:nth-child(1):hover { background: #34b7f1; }
+        .social-links a:nth-child(2):hover { background: #0077b5; }
+        .social-links a:nth-child(3):hover { background: #333; }
+        .social-links a:nth-child(4):hover { background: #25d366; }
+        .social-links a:nth-child(5):hover { background: #1877f2; }
+        .social-links a:nth-child(6):hover { background: #ff0000; }
+        .footer-bottom {
+            text-align: center;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* ===== MOBILE ENHANCEMENTS (DESKTOP UNCHANGED) ===== */
+        @media (max-width: 768px) {
+            /* Header alignment – fixed left edge */
+            header {
+                padding: 12px 16px 12px 3px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .logo {
+                flex: 1;
+                white-space: nowrap;
+                padding-left: 0;
+                margin-left: 0;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            h1 {
+                font-size: 1rem;
+                white-space: nowrap;
+                margin: 0;
+                padding: 0;
+            }
+            .header-actions {
+                display: none;
+            }
+            .mobile-header-buttons {
+                display: flex;
+                gap: 6px;
+                align-items: center;
+            }
+            .mobile-header-buttons button {
+                border: none;
+                color: white;
+                padding: 6px 8px;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                cursor: pointer;
+                box-shadow: var(--box-shadow);
+                transition: all 0.2s ease;
+            }
+            /* Default backgrounds */
+            #mobileResetBtn { background: var(--danger); }
+            #mobileThemeToggleBtn { background: var(--warning); }
+            #mobileReportBtn { background: var(--secondary); }
+            #mobileBackupBtn { background: var(--success); }
+
+            /* Hover effects */
+            #mobileResetBtn:hover {
+                background: #d9042b !important;
+                transform: translateY(-1px);
+            }
+            #mobileThemeToggleBtn:hover {
+                background: #e67e22 !important;
+                transform: translateY(-1px);
+            }
+            #mobileReportBtn:hover {
+                background: #8a2be2 !important;
+                transform: translateY(-1px);
+            }
+            #mobileBackupBtn:hover {
+                background: #0f9d58 !important;
+                transform: translateY(-1px);
+            }
+
+            /* mobile tabs */
+            .mobile-tabs {
+                display: flex;
+                justify-content: space-around;
+                background: var(--light);
+                border-radius: var(--border-radius);
+                margin-bottom: 20px;
+                box-shadow: var(--box-shadow);
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 8px 4px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+            .mobile-tab {
+                flex: 1;
+                text-align: center;
+                padding: 8px 4px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--gray);
+                background: transparent;
+                border: none;
+                border-radius: 30px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .mobile-tab i {
+                margin-right: 4px;
+                font-size: 0.9rem;
+            }
+            .mobile-tab.active {
+                background: var(--primary);
+                color: white;
+            }
+
+            /* dashboard row-wise cards */
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .card {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                text-align: left;
+                border-top: none;
+                border-left: 4px solid var(--primary);
+            }
+            .card h2 {
+                margin: 0;
+                font-size: 0.9rem;
+                justify-content: flex-start;
+            }
+            .card .value {
+                font-size: 1.2rem;
+                justify-content: flex-end;
+            }
+
+            /* entries as cards (table → cards) */
+            .entries-table,
+            .entries-table thead,
+            .entries-table tbody,
+            .entries-table tr,
+            .entries-table th,
+            .entries-table td {
+                display: block;
+            }
+            .entries-table thead {
+                display: none;
+            }
+            .entries-table tr {
+                display: block;
+                background: var(--light);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                padding: 12px;
+                box-shadow: var(--box-shadow);
+                border-left: 4px solid;
+            }
+            .entries-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .entries-table td:last-child {
+                border-bottom: none;
+            }
+            .entries-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--gray);
+                width: 40%;
+            }
+            .action-cell {
+                justify-content: flex-end;
+            }
+
+            /* trash buttons row */
+            .trash-section .bulk-actions {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .trash-section .bulk-actions .btn {
+                flex: 1;
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            /* charts */
+            .charts-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .chart-wrapper {
+                height: 250px;
+            }
+
+            /* controls & search */
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .search-bar {
+                width: 100%;
+            }
+            .search-bar input {
+                width: 100%;
+            }
+
+            /* backup buttons */
+            .backup-actions {
+                flex-direction: column;
+            }
+            .backup-actions .btn {
+                width: 100%;
+            }
+
+            /* desktop‑only hidden */
+            .desktop-only {
+                display: none !important;
+            }
+
+            /* ========== COMPACT MOBILE FOOTER ========== */
+            footer {
+                padding: 24px 16px !important;
+                margin-top: 30px;
+            }
+            .footer-content {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+                text-align: center;
+            }
+            .footer-info h3 {
+                font-size: 1.2rem !important;
+                margin-bottom: 8px !important;
+                letter-spacing: -0.3px;
+            }
+            .footer-info p {
+                font-size: 0.8rem !important;
+                line-height: 1.4 !important;
+                color: rgba(255, 255, 255, 0.85) !important;
+            }
+            .footer-links h3 {
+                font-size: 1rem !important;
+                margin-bottom: 12px !important;
+                font-weight: 600;
+            }
+            .social-links {
+                margin-top: 0 !important;
+                gap: 14px !important;
+                justify-content: center !important;
+            }
+            .social-links a {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.3rem !important;
+                background: rgba(255, 255, 255, 0.12) !important;
+                transition: all 0.2s ease !important;
+                backdrop-filter: blur(2px);
+            }
+            .social-links a:hover {
+                transform: translateY(-3px) scale(1.05) !important;
+                background: rgba(255, 255, 255, 0.25) !important;
+                box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2) !important;
+            }
+            /* hover colors (same as desktop) */
+            .social-links a:nth-child(1):hover { background: #34b7f1 !important; }
+            .social-links a:nth-child(2):hover { background: #0077b5 !important; }
+            .social-links a:nth-child(3):hover { background: #333 !important; }
+            .social-links a:nth-child(4):hover { background: #25d366 !important; }
+            .social-links a:nth-child(5):hover { background: #1877f2 !important; }
+            .social-links a:nth-child(6):hover { background: #ff0000 !important; }
+
+            .footer-bottom {
+                margin-top: 20px !important;
+                padding-top: 16px !important;
+                font-size: 0.7rem !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+                color: rgba(255, 255, 255, 0.7) !important;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-header-buttons, .mobile-tabs { display: none !important; }
+            .mobile-only { display: none !important; }
+        }
+
+        /* Mobile entry card styles */
+        .entry-card-mobile {
+            background: var(--light);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            box-shadow: var(--box-shadow);
+            border-left: 4px solid;
+        }
+        .entry-card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .entry-card-row:last-child {
+            border-bottom: none;
+        }
+        .entry-card-label {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        .entry-card-value {
+            text-align: right;
+            word-break: break-word;
+            max-width: 60%;
+        }
+        .entry-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .entry-card-checkbox {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-money-bill-wave fa-2x" style="background: var(--card-gradient); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent;"></i>
+                <h1>Cash Manager</h1>
+            </div>
+            <div class="header-actions desktop-only">
+                <button id="resetAll" class="reset-btn"><i class="fas fa-redo"></i> Reset Data</button>
+                <button id="themeToggle" class="theme-toggle"><i class="fas fa-moon"></i> Dark Mode</button>
+                <button class="report-btn" id="generateReport"><i class="fas fa-file-alt"></i> Generate Report</button>
+                <button class="backup-btn" id="backupBtn"><i class="fas fa-cloud-download-alt"></i> Backup</button>
+            </div>
+            <div class="mobile-header-buttons mobile-only">
+                <button id="mobileResetBtn"><i class="fas fa-trash-alt"></i></button>
+                <button id="mobileThemeToggleBtn"><i class="fas fa-moon"></i></button>
+                <button id="mobileReportBtn"><i class="fas fa-file-alt"></i></button>
+                <button id="mobileBackupBtn"><i class="fas fa-download"></i></button>
+            </div>
+        </header>
+
+        <!-- Mobile tabs -->
+        <div class="mobile-tabs mobile-only">
+            <button class="mobile-tab active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Dash</button>
+            <button class="mobile-tab" data-tab="entries"><i class="fas fa-list"></i> Entries</button>
+            <button class="mobile-tab" data-tab="search"><i class="fas fa-search"></i> Search</button>
+            <button class="mobile-tab" data-tab="analytics"><i class="fas fa-chart-pie"></i> Analytics</button>
+            <button class="mobile-tab" data-tab="trash"><i class="fas fa-trash"></i> Trash</button>
+            <button class="mobile-tab" data-tab="backup"><i class="fas fa-database"></i> Backup</button>
+        </div>
+
+        <section class="dashboard tab-section" id="dashboard-section">
+            <div class="card income-card">
+                <h2><i class="fas fa-arrow-down"></i> Total Income</h2>
+                <div class="value"><span>$</span><span id="totalIncome">0.00</span></div>
+            </div>
+            <div class="card expense-card">
+                <h2><i class="fas fa-arrow-up"></i> Total Expenses</h2>
+                <div class="value"><span>$</span><span id="totalExpenses">0.00</span></div>
+            </div>
+            <div class="card loan-card">
+                <h2><i class="fas fa-hand-holding-usd"></i> Net Loan</h2>
+                <div class="value"><span>$</span><span id="netLoan">0.00</span></div>
+            </div>
+            <div class="card amanat-card">
+                <h2><i class="fas fa-shield-alt"></i> Amanat Balance</h2>
+                <div class="value"><span>$</span><span id="amanatBalance">0.00</span></div>
+            </div>
+            <div class="card savings-card">
+                <h2><i class="fas fa-piggy-bank"></i> Total Savings</h2>
+                <div class="value"><span>$</span><span id="totalSavings">0.00</span></div>
+            </div>
+            <div class="card online-payments-card">
+                <h2><i class="fas fa-mobile-alt"></i> Online Payments</h2>
+                <div class="value"><span>$</span><span id="onlinePaymentsBalance">0.00</span></div>
+            </div>
+            <div class="card balance-card">
+                <h2><i class="fas fa-wallet"></i> Net Balance</h2>
+                <div class="value"><span>$</span><span id="remainingBalance">0.00</span></div>
+            </div>
+        </section>
+
+        <section class="form-section tab-section" id="form-section">
+            <h2><i class="fas fa-plus-circle"></i> Add New Entry</h2>
+            <form id="entryForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="amount"><i class="fas fa-dollar-sign"></i> Amount</label>
+                        <input type="number" id="amount" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type"><i class="fas fa-exchange-alt"></i> Type</label>
+                        <select id="type" required>
+                            <option value="Expense" selected>Kharch</option>
+                            <option value="Income">Aamdani</option>
+                            <option value="Savings">Bachat</option>
+                            <option value="Savings-Withdrawal">Bachat Nikasi</option>
+                            <option value="Loan-Given">Udhar Diya</option>
+                            <option value="Loan-Taken">Udhar Liya</option>
+                            <option value="Loan-Returned">Udhar Wapas Kiya</option>
+                            <option value="Loan-Received">Udhar Wapas Mila</option>
+                            <option value="Amanat">Amanat Jama</option>
+                            <option value="Amanat-Withdrawal">Amanat Nikasi</option>
+                        </select>
+                    </div>
+                    <div class="form-group category-group">
+                        <label for="categoryGroup"><i class="fas fa-layer-group"></i> Category</label>
+                        <select id="categoryGroup">
+                            <option value="">Select Category</option>
+                            <option value="Zarooriat">Zarooriat</option>
+                            <option value="Khwahishat">Khwahishat</option>
+                            <option value="Self Growth">Self Growth</option>
+                            <option value="Business">Business</option>
+                            <option value="Achanak">Achanak</option>
+                            <option value="Online Payments">Online Payments</option>
+                        </select>
+                    </div>
+                    <div class="form-group category-item-group">
+                        <label for="categoryItem"><i class="fas fa-tag"></i> Item</label>
+                        <select id="categoryItem">
+                            <option value="">Select Item</option>
+                        </select>
+                    </div>
+                    <div class="form-group person-name-group" style="display: none;">
+                        <label for="personName"><i class="fas fa-user"></i> Person Name (Required)</label>
+                        <input type="text" id="personName" placeholder="Enter person name">
+                    </div>
+                    <div class="form-group">
+                        <label for="date"><i class="fas fa-calendar"></i> Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="note"><i class="fas fa-sticky-note"></i> Note (Optional)</label>
+                    <textarea id="note" placeholder="Add a detailed description..."></textarea>
+                </div>
+                <div class="actions">
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Add Entry
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="controls tab-section" id="controls-section">
+            <div class="filters">
+                <div class="form-group">
+                    <label for="startDate"><i class="fas fa-calendar-alt"></i> From</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label for="endDate"><i class="fas fa-calendar-alt"></i> To</label>
+                    <input type="date" id="endDate">
+                </div>
+                <div class="form-group">
+                    <label for="filterCategory"><i class="fas fa-filter"></i> Category</label>
+                    <select id="filterCategory">
+                        <option value="">Tamam Categories</option>
+                        <option value="Income">Aamdani</option>
+                        <option value="Expense">Kharch</option>
+                        <option value="Savings">Bachat</option>
+                        <option value="Loan-Given">Udhar Diya</option>
+                        <option value="Loan-Taken">Udhar Liya</option>
+                        <option value="Loan-Returned">Udhar Wapas Kiya</option>
+                        <option value="Loan-Received">Udhar Wapas Mila</option>
+                        <option value="Amanat">Amanat Jama</option>
+                        <option value="Amanat-Withdrawal">Amanat Nikasi</option>
+                        <option value="Zarooriat">Zarooriat</option>
+                        <option value="Khwahishat">Khwahishat</option>
+                        <option value="Self Growth">Self Growth</option>
+                        <option value="Business">Business</option>
+                        <option value="Achanak">Achanak</option>
+                        <option value="Online Payments">Online Payments</option>
+                    </select>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search entries...">
+                <button class="btn btn-primary" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </section>
+
+        <section class="entries-section tab-section" id="entries-section">
+            <h2><i class="fas fa-list"></i> All Entries</h2>
+            <div class="bulk-actions">
+                <button class="btn btn-danger" id="deleteSelected">
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="entries-table" id="entriesTableDesktop">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell"><input type="checkbox" id="selectAllEntries"></th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Person</th>
+                            <th>Category</th>
+                            <th>Item</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entriesList"></tbody>
+                </table>
+            </div>
+            <div id="entriesMobileContainer" style="display: none;"></div>
+            <div id="noEntries" class="no-data">
+                <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                <h3>No entries yet</h3>
+                <p>Add your first income or expense to get started</p>
+            </div>
+            <div class="pagination" id="paginationContainer"></div>
+        </section>
+
+        <section class="charts-section tab-section" id="charts-section">
+            <div class="chart-container">
+                <h2><i class="fas fa-chart-bar"></i> Monthly Spending</h2>
+                <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
+            </div>
+            <div class="chart-container">
+                <h2><i class="fas fa-chart-pie"></i>Main Category</h2>
+                <div class="chart-wrapper"><canvas id="categoryChart"></canvas></div>
+            </div>
+            <div class="chart-container">
+                <h2><i class="fas fa-list"></i>Category Items</h2>
+                <div style="margin-bottom:10px; display:flex; gap:10px; align-items:center;">
+                    <label for="chartCategorySelect">Main Category:</label>
+                    <select id="chartCategorySelect">
+                        <option value="Zarooriat">Zarooriat</option>
+                        <option value="Khwahishat">Khwahishat</option>
+                        <option value="Self Growth">Self Growth</option>
+                        <option value="Business">Business</option>
+                        <option value="Achanak">Achanak</option>
+                        <option value="Online Payments">Online Payments</option>
+                    </select>
+                </div>
+                <div class="chart-wrapper"><canvas id="itemChart"></canvas></div>
+            </div>
+            <div class="chart-container">
+                <h2><i class="fas fa-chart-line"></i> Monthly Category Comparison</h2>
+                <div class="chart-wrapper"><canvas id="monthlyCategoryChart"></canvas></div>
+            </div>
+        </section>
+
+        <section class="chart-detail-section tab-section" id="chart-detail-section">
+            <div class="chart-container">
+                <h2><i class="fas fa-boxes"></i> Items Detail (All Items)</h2>
+                <div class="chart-wrapper"><canvas id="itemsDetailChart"></canvas></div>
+            </div>
+        </section>
+
+        <section class="trash-section tab-section" id="trash-section">
+            <h2><i class="fas fa-trash"></i> Trash</h2>
+            <button id="toggleTrash" class="trash-toggle">
+                <i class="fas fa-chevron-down"></i> Show Trash
+            </button>
+            <div class="trash-content" id="trashContent">
+                <div class="bulk-actions">
+                    <button class="btn btn-success" id="restoreSelected"><i class="fas fa-undo"></i> Restore Selected</button>
+                    <button class="btn btn-danger" id="permanentDeleteSelected"><i class="fas fa-times"></i> Delete Selected</button>
+                    <button class="btn btn-warning" id="emptyTrash"><i class="fas fa-trash-alt"></i> Empty Trash</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="entries-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="selectAllTrash"></th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Person</th>
+                                <th>Category</th>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trashList"></tbody>
+                    </table>
+                </div>
+                <div id="trashMobileContainer" style="display: none;"></div>
+                <div id="noTrash" class="no-data">
+                    <i class="fas fa-trash-alt" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <h3>Trash is empty</h3>
+                    <p>Deleted items will appear here</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="backup-section tab-section" id="backup-section">
+            <h2><i class="fas fa-database"></i> Backup & Restore</h2>
+            <div class="backup-actions">
+                <button class="btn btn-success" id="exportData"><i class="fas fa-file-export"></i> Export to File</button>
+                <button class="btn btn-secondary" id="changeBackupDir" title="Change backup folder"><i class="fas fa-folder-open"></i> Change Backup Folder</button>
+                <button class="btn btn-primary" id="importData"><i class="fas fa-file-import"></i> Import from File</button>
+                <button class="btn btn-secondary" id="saveToDrive"><i class="fab fa-google-drive"></i> Save to Google Drive</button>
+            </div>
+            <p style="margin-top: 20px; color: var(--gray); font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Your data is automatically saved using advanced browser storage.
+            </p>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>Cash Manager</h3>
+                    <p>
+                        Cash Management System v2.2 (<span id="currentDate">Mar 21, 2026</span>)<br>©Copyright 2025 by I.T. Department of ALQAAB Tech by ALQAAB-Hub | Shahbaz Ali
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect With Us</h3>
+                    <div class="social-links">
+                        <a href="https://maps.app.goo.gl/VRAW4Poyuh58bCPw5" target="_blank" title="Location"><i class="fas fa-map-marker-alt"></i></a>
+                        <a href="https://www.linkedin.com/in/alqaaborg" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/ALQAAB-Hub" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="https://wa.me/923261182021" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.facebook.com/alqaab.org" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@ALQAAB_YT_Studio" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Designed with ❤️ ALQAAB Hub</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Database and storage management
+        const DB_NAME = 'ExpenseManagerDB';
+        const DB_VERSION = 2; // Updated version for new schema
+        
+        // Type display mapping (Roman Urdu me)
+        const typeDisplayMap = {
+            "Expense": "Kharch",
+            "Income": "Aamdani",
+            "Savings": "Bachat",
+            "Savings-Withdrawal": "Bachat Nikasi",
+            "Loan-Given": "Udhar Diya",
+            "Loan-Taken": "Udhar Liya", 
+            "Loan-Returned": "Udhar Wapas Kiya",
+            "Loan-Received": "Udhar Wapas Mila",
+            "Amanat": "Amanat Jama",
+            "Amanat-Withdrawal": "Amanat Nikasi"
+        };
+
+        // Populate category items dropdown based on selected main group
+        function populateCategoryItems(group) {
+            categoryItemSelect.innerHTML = '<option value="">Select Item</option>';
+            if (!group || !CATEGORY_ITEMS[group]) return;
+            for (const item of CATEGORY_ITEMS[group]) {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                categoryItemSelect.appendChild(opt);
+            }
+        }
+
+        function getDisplayType(type) {
+            return typeDisplayMap[type] || type;
+        }
+        
+        const STORE_ENTRIES = 'entries';
+        const STORE_TRASH = 'trash';
+        
+        let db = null;
+        let entries = [];
+        let trash = [];
+        let editingId = null;
+        
+        // Pagination variables
+        let currentPage = 1;
+        const entriesPerPage = 20;
+        
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const resetAll = document.getElementById('resetAll');
+        const entryForm = document.getElementById('entryForm');
+        const entriesList = document.getElementById('entriesList');
+        const trashList = document.getElementById('trashList');
+        const noEntries = document.getElementById('noEntries');
+        const noTrash = document.getElementById('noTrash');
+        const toggleTrash = document.getElementById('toggleTrash');
+        const trashContent = document.getElementById('trashContent');
+        const totalIncome = document.getElementById('totalIncome');
+        const totalExpenses = document.getElementById('totalExpenses');
+        const totalSavings = document.getElementById('totalSavings');
+        const netLoan = document.getElementById('netLoan');
+        const amanatBalance = document.getElementById('amanatBalance');
+        const onlinePaymentsBalance = document.getElementById('onlinePaymentsBalance');
+        const remainingBalance = document.getElementById('remainingBalance');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const filterCategory = document.getElementById('filterCategory');
+        const categoryGroupSelect = document.getElementById('categoryGroup');
+        const categoryItemSelect = document.getElementById('categoryItem');
+        const typeSelect = document.getElementById('type');
+        const personNameInput = document.getElementById('personName');
+        const personNameGroup = document.querySelector('.person-name-group');
+        const exportBtn = document.getElementById('exportData');
+        const changeBackupBtn = document.getElementById('changeBackupDir');
+        const importBtn = document.getElementById('importData');
+        const saveToDriveBtn = document.getElementById('saveToDrive');
+        const generateReportBtn = document.getElementById('generateReport');
+        const deleteSelectedBtn = document.getElementById('deleteSelected');
+        const restoreSelectedBtn = document.getElementById('restoreSelected');
+        const permanentDeleteSelectedBtn = document.getElementById('permanentDeleteSelected');
+        const emptyTrashBtn = document.getElementById('emptyTrash');
+        const selectAllEntries = document.getElementById('selectAllEntries');
+        const selectAllTrash = document.getElementById('selectAllTrash');
+        const paginationContainer = document.getElementById('paginationContainer');
+        
+        // Chart variables
+        let barChart, categoryChart, itemChart, monthlyCategoryChart, itemsDetailChart;
+
+        // CATEGORY ITEMS (strict grouping provided by user)
+        const CATEGORY_ITEMS = {
+            "Khwahishat": [
+                'Eating Out',
+                'Shopping',
+                'Entertainment (Movies, Netflix, Games)',
+                'Travel / Picnic',
+                'Gifts'
+            ],
+            "Zarooriat": [
+                'Home / Rent',
+                'Bijli, Pani, Gas',
+                'Rashan (Groceries)',
+                'Transport (Fuel, Bus, Careem, Bike)',
+                'Health / Medicine'
+            ],
+            "Self Growth": [
+                'Courses',
+                'Books',
+                'Coaching / Tuition',
+                'Online Subscriptions (Udemy, Coursera)'
+            ],
+            "Business": [
+                'Investment',
+                'Tools / Software',
+                'Marketing',
+                'Office Expense'
+            ],
+            "Achanak": [
+                'Medical Emergency',
+                'Repair (Mobile, Bike, Home)',
+                'Fine / Unexpected Payment'
+            ],
+            "Online Payments": [
+                'JazzCash',
+                'Easypaisa',
+                'NayaPay',
+                'SadaPay',
+                'Faysal Bank'
+            ]
+        };
+
+        // Main category colors (Khwahishat set to black as requested)
+        const MAIN_CATEGORY_COLORS = {
+            'Zarooriat': '#fca311',
+            'Khwahishat': '#000000',
+            'Self Growth': '#7209b7',
+            'Business': '#4361ee',
+            'Achanak': '#f72585',
+            'Online Payments': '#34a853'
+        };
+
+        function getColorForLabel(label) {
+            for (const group in CATEGORY_ITEMS) {
+                if (CATEGORY_ITEMS[group].includes(label)) return MAIN_CATEGORY_COLORS[group] || '#cccccc';
+            }
+            return null;
+        }
+        
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = (event) => {
+                    console.error('IndexedDB error:', event.target.error);
+                    // Fallback to localStorage
+                    loadFromLocalStorage();
+                    resolve(false);
+                };
+                
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    // Load data from IndexedDB
+                    loadFromIndexedDB().then(() => {
+                        // If IndexedDB is empty but localStorage has data, migrate it
+                        if (entries.length === 0 && trash.length === 0) {
+                            const localEntries = JSON.parse(localStorage.getItem('expenseEntries')) || [];
+                            const localTrash = JSON.parse(localStorage.getItem('expenseTrash')) || [];
+                            
+                            if (localEntries.length > 0 || localTrash.length > 0) {
+                                entries = localEntries;
+                                trash = localTrash;
+                                saveToIndexedDB().then(() => {
+                                    console.log('Data migrated from localStorage to IndexedDB');
+                                    updateDashboard();
+                                    renderEntries();
+                                    renderTrash();
+                                    initCharts();
+                                });
+                            }
+                        }
+                        resolve(true);
+                    });
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    
+                    // Create object stores if they don't exist
+                    if (!db.objectStoreNames.contains(STORE_ENTRIES)) {
+                        const entriesStore = db.createObjectStore(STORE_ENTRIES, { keyPath: 'id' });
+                        entriesStore.createIndex('date', 'date', { unique: false });
+                        entriesStore.createIndex('type', 'type', { unique: false });
+                        entriesStore.createIndex('personName', 'personName', { unique: false });
+                    }
+                    
+                    if (!db.objectStoreNames.contains(STORE_TRASH)) {
+                        const trashStore = db.createObjectStore(STORE_TRASH, { keyPath: 'id' });
+                        trashStore.createIndex('date', 'date', { unique: false });
+                    }
+                };
+            });
+        }
+        
+        // Load data from IndexedDB
+        async function loadFromIndexedDB() {
+            if (!db) return;
+            
+            try {
+                const tx = db.transaction([STORE_ENTRIES, STORE_TRASH], 'readonly');
+                const entriesStore = tx.objectStore(STORE_ENTRIES);
+                const trashStore = tx.objectStore(STORE_TRASH);
+                
+                const entriesRequest = entriesStore.getAll();
+                const trashRequest = trashStore.getAll();
+                
+                entries = await new Promise((resolve) => {
+                    entriesRequest.onsuccess = () => resolve(entriesRequest.result);
+                    entriesRequest.onerror = () => resolve([]);
+                });
+                
+                trash = await new Promise((resolve) => {
+                    trashRequest.onsuccess = () => resolve(trashRequest.result);
+                    trashRequest.onerror = () => resolve([]);
+                });
+                
+                // Sync with localStorage as backup
+                localStorage.setItem('expenseEntries', JSON.stringify(entries));
+                localStorage.setItem('expenseTrash', JSON.stringify(trash));
+                
+            } catch (error) {
+                console.error('Error loading from IndexedDB:', error);
+                loadFromLocalStorage();
+            }
+        }
+        
+        // Load data from localStorage (fallback)
+        function loadFromLocalStorage() {
+            entries = JSON.parse(localStorage.getItem('expenseEntries')) || [];
+            trash = JSON.parse(localStorage.getItem('expenseTrash')) || [];
+        }
+        
+        // Save data to IndexedDB
+        async function saveToIndexedDB() {
+            if (!db) {
+                // Fallback to localStorage
+                saveToLocalStorage();
+                return;
+            }
+            
+            try {
+                const tx = db.transaction([STORE_ENTRIES, STORE_TRASH], 'readwrite');
+                const entriesStore = tx.objectStore(STORE_ENTRIES);
+                const trashStore = tx.objectStore(STORE_TRASH);
+                
+                // Clear existing data
+                entriesStore.clear();
+                trashStore.clear();
+                
+                // Add all entries
+                for (const entry of entries) {
+                    entriesStore.add(entry);
+                }
+                
+                // Add all trash items
+                for (const item of trash) {
+                    trashStore.add(item);
+                }
+                
+                // Also save to localStorage as backup
+                saveToLocalStorage();
+                
+            } catch (error) {
+                console.error('Error saving to IndexedDB:', error);
+                saveToLocalStorage();
+            }
+        }
+        
+        // Save data to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('expenseEntries', JSON.stringify(entries));
+            localStorage.setItem('expenseTrash', JSON.stringify(trash));
+        }
+        
+        // Combined save function
+        async function saveData() {
+            await saveToIndexedDB();
+        }
+        
+        // Helper: escape HTML to prevent XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Render entries (table on desktop, cards on mobile)
+        function renderEntries() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryFilter = filterCategory.value;
+            const startDateFilter = startDate.value;
+            const endDateFilter = endDate.value;
+            
+            let filteredEntries = entries.filter(entry => {
+                const matchesSearch = !searchTerm || 
+                    (entry.note && entry.note.toLowerCase().includes(searchTerm)) ||
+                    (entry.personName && entry.personName.toLowerCase().includes(searchTerm)) ||
+                    (entry.categoryGroup || '').toLowerCase().includes(searchTerm) ||
+                    (entry.categoryItem || '').toLowerCase().includes(searchTerm);
+                
+                const matchesCategory = !categoryFilter || 
+                    entry.type === categoryFilter ||
+                    entry.categoryGroup === categoryFilter ||
+                    entry.categoryItem === categoryFilter;
+                
+                const matchesDate = (!startDateFilter || entry.date >= startDateFilter) && 
+                                  (!endDateFilter || entry.date <= endDateFilter);
+                
+                return matchesSearch && matchesCategory && matchesDate;
+            });
+            
+            filteredEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const totalPages = Math.ceil(filteredEntries.length / entriesPerPage);
+            const startIndex = (currentPage - 1) * entriesPerPage;
+            const endIndex = Math.min(startIndex + entriesPerPage, filteredEntries.length);
+            const pageEntries = filteredEntries.slice(startIndex, endIndex);
+            
+            renderPagination(totalPages);
+            
+            if (filteredEntries.length === 0) {
+                entriesList.innerHTML = '';
+                document.getElementById('entriesMobileContainer').innerHTML = '';
+                noEntries.style.display = 'block';
+                paginationContainer.innerHTML = '';
+                return;
+            }
+            
+            noEntries.style.display = 'none';
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Mobile: cards
+                document.getElementById('entriesTableDesktop').style.display = 'none';
+                const mobileContainer = document.getElementById('entriesMobileContainer');
+                mobileContainer.style.display = 'block';
+                mobileContainer.innerHTML = '';
+                
+                pageEntries.forEach(entry => {
+                    let typeClass = entry.type.toLowerCase().replace(' ', '-');
+                    if (entry.type === 'Savings-Withdrawal') typeClass = 'savings';
+                    else if (entry.type === 'Loan-Given') typeClass = 'loan-given';
+                    else if (entry.type === 'Loan-Taken') typeClass = 'loan-taken';
+                    else if (entry.type === 'Amanat' || entry.type === 'Amanat-Withdrawal') typeClass = 'amanat';
+                    else if (entry.categoryGroup === 'Online Payments') typeClass = 'online-payments';
+                    
+                    const isPositive = entry.type === 'Income' || entry.type === 'Savings-Withdrawal' || 
+                                     entry.type === 'Loan-Taken' || entry.type === 'Loan-Received' ||
+                                     entry.type === 'Amanat-Withdrawal';
+                    
+                    let borderColor = 'var(--primary)';
+                    if (entry.type === 'Income') borderColor = 'var(--success)';
+                    else if (entry.type === 'Expense') borderColor = 'var(--danger)';
+                    else if (entry.type === 'Savings') borderColor = '#9d4edd';
+                    else if (entry.type === 'Loan-Given' || entry.type === 'Loan-Taken') borderColor = '#fca311';
+                    else if (entry.type === 'Amanat') borderColor = '#9d4edd';
+                    else if (entry.categoryGroup === 'Online Payments') borderColor = '#34a853';
+                    
+                    let cardHtml = `<div class="entry-card-mobile" data-id="${entry.id}" style="border-left-color: ${borderColor};">`;
+                    
+                    // Select row
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-check-square"></i> Select</span>
+                        <span class="entry-card-value"><input type="checkbox" class="entry-checkbox" data-id="${entry.id}"></span>
+                    </div>`;
+                    
+                    // Date
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-calendar"></i> Date</span>
+                        <span class="entry-card-value">${formatDate(entry.date)}</span>
+                    </div>`;
+                    
+                    // Description (if present)
+                    if (entry.note && entry.note.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-sticky-note"></i> Description</span>
+                            <span class="entry-card-value">${escapeHtml(entry.note)}</span>
+                        </div>`;
+                    }
+                    
+                    // Person (if present)
+                    if (entry.personName && entry.personName.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-user"></i> Person</span>
+                            <span class="entry-card-value">${escapeHtml(entry.personName)}</span>
+                        </div>`;
+                    }
+                    
+                    // Category group (if present)
+                    if (entry.categoryGroup && entry.categoryGroup.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-layer-group"></i> Category</span>
+                            <span class="entry-card-value"><span class="main-category">${escapeHtml(entry.categoryGroup)}</span></span>
+                        </div>`;
+                    }
+                    
+                    // Category item (if present)
+                    if (entry.categoryItem && entry.categoryItem.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-tag"></i> Item</span>
+                            <span class="entry-card-value"><span class="entry-category">${escapeHtml(entry.categoryItem)}</span></span>
+                        </div>`;
+                    }
+                    
+                    // Type
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-exchange-alt"></i> Type</span>
+                        <span class="entry-card-value"><span class="type-badge ${typeClass}-badge">${getDisplayType(entry.type)}</span></span>
+                    </div>`;
+                    
+                    // Amount
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-dollar-sign"></i> Amount</span>
+                        <span class="entry-card-value ${isPositive ? 'income' : 'expense'}">${isPositive ? '+' : '-'}$${entry.amount.toFixed(2)}</span>
+                    </div>`;
+                    
+                    // Actions
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label">Actions</span>
+                        <span class="entry-card-value entry-card-actions">
+                            <button class="action-btn edit-btn" onclick="editEntry(${entry.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" onclick="deleteEntry(${entry.id})"><i class="fas fa-trash"></i></button>
+                        </span>
+                    </div>`;
+                    
+                    cardHtml += `</div>`;
+                    mobileContainer.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            } else {
+                // Desktop: table
+                document.getElementById('entriesTableDesktop').style.display = 'table';
+                document.getElementById('entriesMobileContainer').style.display = 'none';
+                
+                entriesList.innerHTML = pageEntries.map(entry => {
+                    let typeClass = entry.type.toLowerCase().replace(' ', '-');
+                    if (entry.type === 'Savings-Withdrawal') typeClass = 'savings';
+                    else if (entry.type === 'Loan-Given') typeClass = 'loan-given';
+                    else if (entry.type === 'Loan-Taken') typeClass = 'loan-taken';
+                    else if (entry.type === 'Amanat' || entry.type === 'Amanat-Withdrawal') typeClass = 'amanat';
+                    else if (entry.categoryGroup === 'Online Payments') typeClass = 'online-payments';
+                    
+                    const isPositive = entry.type === 'Income' || entry.type === 'Savings-Withdrawal' || 
+                                     entry.type === 'Loan-Taken' || entry.type === 'Loan-Received' ||
+                                     entry.type === 'Amanat-Withdrawal';
+                    
+                    return `
+                    <tr class="${typeClass}-row">
+                        <td class="checkbox-cell"><input type="checkbox" class="entry-checkbox" data-id="${entry.id}"></td>
+                        <td>${formatDate(entry.date)}</td>
+                        <td>${escapeHtml(entry.note || 'No description')}</td>
+                        <td>${escapeHtml(entry.personName || '-')}</td>
+                        <td>${entry.categoryGroup ? `<span class="main-category">${escapeHtml(entry.categoryGroup)}</span>` : '-'}</td>
+                        <td>${entry.categoryItem ? `<span class="entry-category">${escapeHtml(entry.categoryItem)}</span>` : '-'}</td>
+                        <td><span class="type-badge ${typeClass}-badge">${getDisplayType(entry.type)}</span></td>
+                        <td class="${isPositive ? 'income' : 'expense'}">${isPositive ? '+' : '-'}$${entry.amount.toFixed(2)}</td>
+                        <td class="action-cell">
+                            <button class="action-btn edit-btn" onclick="editEntry(${entry.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" onclick="deleteEntry(${entry.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+            
+            // Sync select all checkbox state
+            const checkboxes = document.querySelectorAll('.entry-checkbox');
+            selectAllEntries.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
+        
+        // Render trash (table on desktop, cards on mobile)
+        function renderTrash() {
+            if (trash.length === 0) {
+                trashList.innerHTML = '';
+                document.getElementById('trashMobileContainer').innerHTML = '';
+                noTrash.style.display = 'block';
+                return;
+            }
+            
+            noTrash.style.display = 'none';
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Hide desktop table, show mobile container
+                document.querySelector('#trash-section .table-responsive table').style.display = 'none';
+                const mobileContainer = document.getElementById('trashMobileContainer');
+                mobileContainer.style.display = 'block';
+                mobileContainer.innerHTML = '';
+                
+                trash.forEach(entry => {
+                    let typeClass = entry.type.toLowerCase().replace(' ', '-');
+                    if (entry.type === 'Savings-Withdrawal') typeClass = 'savings';
+                    else if (entry.type === 'Loan-Given') typeClass = 'loan-given';
+                    else if (entry.type === 'Loan-Taken') typeClass = 'loan-taken';
+                    else if (entry.type === 'Amanat' || entry.type === 'Amanat-Withdrawal') typeClass = 'amanat';
+                    else if (entry.categoryGroup === 'Online Payments') typeClass = 'online-payments';
+                    
+                    const isPositive = entry.type === 'Income' || entry.type === 'Savings-Withdrawal' || 
+                                     entry.type === 'Loan-Taken' || entry.type === 'Loan-Received' ||
+                                     entry.type === 'Amanat-Withdrawal';
+                    
+                    let borderColor = 'var(--primary)';
+                    if (entry.type === 'Income') borderColor = 'var(--success)';
+                    else if (entry.type === 'Expense') borderColor = 'var(--danger)';
+                    else if (entry.type === 'Savings') borderColor = '#9d4edd';
+                    else if (entry.type === 'Loan-Given' || entry.type === 'Loan-Taken') borderColor = '#fca311';
+                    else if (entry.type === 'Amanat') borderColor = '#9d4edd';
+                    else if (entry.categoryGroup === 'Online Payments') borderColor = '#34a853';
+                    
+                    let cardHtml = `<div class="entry-card-mobile" data-id="${entry.id}" style="border-left-color: ${borderColor};">`;
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-check-square"></i> Select</span>
+                        <span class="entry-card-value"><input type="checkbox" class="trash-checkbox" data-id="${entry.id}"></span>
+                    </div>`;
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-calendar"></i> Date</span>
+                        <span class="entry-card-value">${formatDate(entry.date)}</span>
+                    </div>`;
+                    if (entry.note && entry.note.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-sticky-note"></i> Description</span>
+                            <span class="entry-card-value">${escapeHtml(entry.note)}</span>
+                        </div>`;
+                    }
+                    if (entry.personName && entry.personName.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-user"></i> Person</span>
+                            <span class="entry-card-value">${escapeHtml(entry.personName)}</span>
+                        </div>`;
+                    }
+                    if (entry.categoryGroup && entry.categoryGroup.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-layer-group"></i> Category</span>
+                            <span class="entry-card-value"><span class="main-category">${escapeHtml(entry.categoryGroup)}</span></span>
+                        </div>`;
+                    }
+                    if (entry.categoryItem && entry.categoryItem.trim() !== '') {
+                        cardHtml += `<div class="entry-card-row">
+                            <span class="entry-card-label"><i class="fas fa-tag"></i> Item</span>
+                            <span class="entry-card-value"><span class="entry-category">${escapeHtml(entry.categoryItem)}</span></span>
+                        </div>`;
+                    }
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-exchange-alt"></i> Type</span>
+                        <span class="entry-card-value"><span class="type-badge ${typeClass}-badge">${getDisplayType(entry.type)}</span></span>
+                    </div>`;
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label"><i class="fas fa-dollar-sign"></i> Amount</span>
+                        <span class="entry-card-value ${isPositive ? 'income' : 'expense'}">${isPositive ? '+' : '-'}$${entry.amount.toFixed(2)}</span>
+                    </div>`;
+                    cardHtml += `<div class="entry-card-row">
+                        <span class="entry-card-label">Actions</span>
+                        <span class="entry-card-value entry-card-actions">
+                            <button class="action-btn restore-btn" onclick="restoreEntry(${entry.id})"><i class="fas fa-undo"></i></button>
+                            <button class="action-btn delete-btn" onclick="permanentDelete(${entry.id})"><i class="fas fa-times"></i></button>
+                        </span>
+                    </div>`;
+                    cardHtml += `</div>`;
+                    mobileContainer.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            } else {
+                // Desktop: show table
+                document.querySelector('#trash-section .table-responsive table').style.display = 'table';
+                document.getElementById('trashMobileContainer').style.display = 'none';
+                
+                trashList.innerHTML = trash.map(entry => {
+                    let typeClass = entry.type.toLowerCase().replace(' ', '-');
+                    if (entry.type === 'Savings-Withdrawal') typeClass = 'savings';
+                    else if (entry.type === 'Loan-Given') typeClass = 'loan-given';
+                    else if (entry.type === 'Loan-Taken') typeClass = 'loan-taken';
+                    else if (entry.type === 'Amanat' || entry.type === 'Amanat-Withdrawal') typeClass = 'amanat';
+                    else if (entry.categoryGroup === 'Online Payments') typeClass = 'online-payments';
+                    
+                    const isPositive = entry.type === 'Income' || entry.type === 'Savings-Withdrawal' || 
+                                     entry.type === 'Loan-Taken' || entry.type === 'Loan-Received' ||
+                                     entry.type === 'Amanat-Withdrawal';
+                    
+                    return `
+                    <tr class="${typeClass}-row">
+                        <td class="checkbox-cell"><input type="checkbox" class="trash-checkbox" data-id="${entry.id}"></td>
+                        <td>${formatDate(entry.date)}</td>
+                        <td>${escapeHtml(entry.note || 'No description')}</td>
+                        <td>${escapeHtml(entry.personName || '-')}</td>
+                        <td>${entry.categoryGroup ? `<span class="main-category">${escapeHtml(entry.categoryGroup)}</span>` : '-'}</td>
+                        <td>${entry.categoryItem ? `<span class="entry-category">${escapeHtml(entry.categoryItem)}</span>` : '-'}</td>
+                        <td><span class="type-badge ${typeClass}-badge">${getDisplayType(entry.type)}</span></td>
+                        <td class="${isPositive ? 'income' : 'expense'}">${isPositive ? '+' : '-'}$${entry.amount.toFixed(2)}</td>
+                        <td class="action-cell">
+                            <button class="action-btn restore-btn" onclick="restoreEntry(${entry.id})"><i class="fas fa-undo"></i></button>
+                            <button class="action-btn delete-btn" onclick="permanentDelete(${entry.id})"><i class="fas fa-times"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+            
+            const checkboxes = document.querySelectorAll('.trash-checkbox');
+            selectAllTrash.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
+        
+        function renderPagination(totalPages) {
+            paginationContainer.innerHTML = '';
+            if (totalPages <= 1) return;
+            
+            const prevBtn = document.createElement('button');
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.classList.add('pagination-btn');
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderEntries();
+                }
+            });
+            paginationContainer.appendChild(prevBtn);
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.classList.add('pagination-btn');
+                if (i === currentPage) pageBtn.classList.add('active');
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderEntries();
+                });
+                paginationContainer.appendChild(pageBtn);
+            }
+            
+            const nextBtn = document.createElement('button');
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.classList.add('pagination-btn');
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderEntries();
+                }
+            });
+            paginationContainer.appendChild(nextBtn);
+        }
+        
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+        
+        function editEntry(id) {
+            const entry = entries.find(entry => entry.id === id);
+            if (!entry) return;
+            
+            // Populate form
+            document.getElementById('amount').value = entry.amount;
+            document.getElementById('categoryGroup').value = entry.categoryGroup || '';
+            // Populate items for the selected group then set value
+            populateCategoryItems(entry.categoryGroup);
+            document.getElementById('categoryItem').value = entry.categoryItem || '';
+            document.getElementById('type').value = entry.type;
+            document.getElementById('date').value = entry.date;
+            document.getElementById('note').value = entry.note || '';
+            document.getElementById('personName').value = entry.personName || '';
+            
+            // Adjust category fields display based on type
+            const categoryGroupGroup = document.querySelector('.category-group');
+            const categoryItemGroup = document.querySelector('.category-item-group');
+            
+            if (entry.type === 'Income') {
+                // Show category fields so user can edit Online Payments category if needed
+                categoryGroupGroup.style.display = 'block';
+                categoryItemGroup.style.display = 'block';
+                personNameGroup.style.display = 'none';
+            } else if (entry.type === 'Savings' || entry.type === 'Savings-Withdrawal') {
+                categoryGroupGroup.style.display = 'none';
+                categoryItemGroup.style.display = 'none';
+                personNameGroup.style.display = 'none';
+            } else if (entry.type.includes('Loan') || entry.type.includes('Amanat')) {
+                categoryGroupGroup.style.display = 'none';
+                categoryItemGroup.style.display = 'none';
+                personNameGroup.style.display = 'block';
+            } else {
+                categoryGroupGroup.style.display = 'block';
+                categoryItemGroup.style.display = 'block';
+                personNameGroup.style.display = 'none';
+            }
+            
+            // Set editing mode
+            editingId = id;
+            document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-save"></i> Update Entry';
+            
+            // Scroll to form
+            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function deleteEntry(id) {
+            const entryIndex = entries.findIndex(entry => entry.id === id);
+            if (entryIndex === -1) return;
+            
+            // Move to trash
+            const [deletedEntry] = entries.splice(entryIndex, 1);
+            trash.push(deletedEntry);
+            
+            // Save and update UI
+            await saveData();
+            updateDashboard();
+            renderEntries();
+            renderTrash();
+            initCharts();
+        }
+        
+        async function restoreEntry(id) {
+            const entryIndex = trash.findIndex(entry => entry.id === id);
+            if (entryIndex === -1) return;
+            
+            // Move back to entries
+            const [restoredEntry] = trash.splice(entryIndex, 1);
+            entries.push(restoredEntry);
+            
+            // Save and update UI
+            await saveData();
+            updateDashboard();
+            renderEntries();
+            renderTrash();
+            initCharts();
+        }
+        
+        async function permanentDelete(id) {
+            const entryIndex = trash.findIndex(entry => entry.id === id);
+            if (entryIndex === -1) return;
+            
+            // Remove from trash
+            trash.splice(entryIndex, 1);
+            
+            // Save and update UI
+            await saveData();
+            renderTrash();
+        }
+        
+        function initCharts() {
+            // Destroy existing charts if they exist
+            if (barChart) barChart.destroy();
+            if (categoryChart) categoryChart.destroy();
+            if (itemChart) itemChart.destroy();
+            if (monthlyCategoryChart) monthlyCategoryChart.destroy();
+            if (itemsDetailChart) itemsDetailChart.destroy();
+            
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#f0f0f0' : '#212529';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
+            // Prepare data for charts
+            const monthlyData = getMonthlyData();
+            const categoryData = getCategoryData();
+
+            // Create bar chart for monthly spending (unchanged)
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthlyData.labels,
+                    datasets: [{
+                        label: 'Income',
+                        data: monthlyData.income,
+                        backgroundColor: '#4cc9f0',
+                        borderColor: '#4cc9f0',
+                        borderWidth: 1
+                    }, {
+                        label: 'Expenses',
+                        data: monthlyData.expenses,
+                        backgroundColor: '#f72585',
+                        borderColor: '#f72585',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                            ticks: {
+                                color: textColor,
+                                callback: function(value) { return '$' + value; }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: textColor }
+                        }
+                    }
+                }
+            });
+
+            // Create doughnut chart for main category spending
+            const catCtx = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryData.labels,
+                    datasets: [{
+                        data: categoryData.data,
+                        backgroundColor: categoryData.labels.map(l => MAIN_CATEGORY_COLORS[l] || '#cccccc'),
+                        borderWidth: 2,
+                        borderColor: isDarkMode ? '#1e1e1e' : '#f8f9fa',
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: textColor }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': $' + context.raw.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create item breakdown chart for selected category
+            const chartCategorySelect = document.getElementById('chartCategorySelect');
+
+            // Restore previously selected category from localStorage if available
+            try {
+                const saved = localStorage.getItem('selectedChartCategory');
+                if (chartCategorySelect && saved) {
+                    const exists = Array.from(chartCategorySelect.options).some(o => o.value === saved);
+                    if (exists) chartCategorySelect.value = saved;
+                }
+            } catch (e) { /* ignore localStorage errors */ }
+
+            const selectedCategory = chartCategorySelect?.value || categoryData.labels[0];
+            const itemData = getItemData(selectedCategory);
+            const itemCtx = document.getElementById('itemChart').getContext('2d');
+            itemChart = new Chart(itemCtx, {
+                type: 'bar',
+                data: {
+                    labels: itemData.labels,
+                    datasets: [{
+                        label: selectedCategory + ' - Items',
+                        data: itemData.data,
+                        backgroundColor: itemData.labels.map(l => getColorForLabel(l) || MAIN_CATEGORY_COLORS[selectedCategory] || '#4361ee')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, callback: v => '$' + v } },
+                        x: { ticks: { color: textColor } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Monthly category comparison chart (lines per main category)
+            const monthlyCatData = getMonthlyCategoryComparisonData();
+            const monthlyCtx = document.getElementById('monthlyCategoryChart').getContext('2d');
+            monthlyCategoryChart = new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyCatData.labels,
+                    datasets: monthlyCatData.datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, callback: v => '$' + v } },
+                        x: { ticks: { color: textColor } }
+                    },
+                    plugins: { legend: { labels: { color: textColor } } }
+                }
+            });
+
+            // Wire the chart category selector to update item chart and persist selection
+            if (chartCategorySelect) {
+                chartCategorySelect.addEventListener('change', function() {
+                    const d = getItemData(this.value);
+                    itemChart.data.labels = d.labels;
+                    itemChart.data.datasets[0].data = d.data;
+                    itemChart.data.datasets[0].label = this.value + ' - Items';
+                    itemChart.data.datasets[0].backgroundColor = d.labels.map(l => getColorForLabel(l) || MAIN_CATEGORY_COLORS[this.value] || '#4361ee');
+                    itemChart.update();
+                    try { localStorage.setItem('selectedChartCategory', this.value); } catch (e) { /* ignore */ }
+                });
+            }
+
+            // Create full-width Items Detail chart (all items across categories)
+            const allItems = getAllItemsData();
+            const itemsCtxEl = document.getElementById('itemsDetailChart');
+            if (itemsCtxEl) {
+                const itemsCtx = itemsCtxEl.getContext('2d');
+                itemsDetailChart = new Chart(itemsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: allItems.labels,
+                        datasets: [{
+                            label: 'Items Detail',
+                            data: allItems.data,
+                            backgroundColor: allItems.labels.map(l => getColorForLabel(l) || '#6a4c93')
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, callback: v => '$' + v } },
+                            x: { ticks: { color: textColor } }
+                        },
+                        plugins: { legend: { labels: { color: textColor } } }
+                    }
+                });
+            }
+        }
+        
+        function getMonthlyData() {
+            const months = [];
+            const now = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                months.push(date.toLocaleString('default', { month: 'short', year: 'numeric' }));
+            }
+            
+            const income = new Array(6).fill(0);
+            const expenses = new Array(6).fill(0);
+            
+            entries.forEach(entry => {
+                const entryDate = new Date(entry.date);
+                const monthDiff = (now.getMonth() - entryDate.getMonth()) + 
+                                  (12 * (now.getFullYear() - entryDate.getFullYear()));
+                
+                if (monthDiff >= 0 && monthDiff < 6) {
+                    const index = 5 - monthDiff;
+                    if (entry.type === 'Income') {
+                        income[index] += entry.amount;
+                    } else if (entry.type === 'Expense') {
+                        expenses[index] += entry.amount;
+                    }
+                }
+            });
+            
+            return { labels: months, income, expenses };
+        }
+        
+        function getCategoryData() {
+            const categories = ['Zarooriat', 'Khwahishat', 'Self Growth', 'Business', 'Achanak', 'Online Payments'];
+            const data = new Array(categories.length).fill(0);
+            
+            entries
+                .filter(entry => entry.type === 'Expense' && entry.categoryGroup)
+                .forEach(entry => {
+                    const index = categories.indexOf(entry.categoryGroup);
+                    if (index !== -1) {
+                        data[index] += entry.amount;
+                    }
+                });
+            
+            return { labels: categories, data };
+        }
+
+        function getItemData(group) {
+            const items = CATEGORY_ITEMS[group] || [];
+            const data = items.map(_ => 0);
+
+            entries
+                .filter(entry => entry.type === 'Expense' && entry.categoryGroup === group && entry.categoryItem)
+                .forEach(entry => {
+                    const idx = items.indexOf(entry.categoryItem);
+                    if (idx !== -1) data[idx] += entry.amount;
+                });
+                
+            // Also include Income entries for Online Payments category if group is Online Payments
+            if (group === 'Online Payments') {
+                entries
+                    .filter(entry => entry.type === 'Income' && entry.categoryGroup === group && entry.categoryItem)
+                    .forEach(entry => {
+                        const idx = items.indexOf(entry.categoryItem);
+                        if (idx !== -1) data[idx] += entry.amount;
+                    });
+            }
+
+            return { labels: items, data };
+        }
+
+        function getAllItemsData() {
+            const labels = [];
+            const data = [];
+
+            for (const group in CATEGORY_ITEMS) {
+                const items = CATEGORY_ITEMS[group];
+                for (const it of items) {
+                    labels.push(it);
+                    data.push(0);
+                }
+            }
+
+            entries
+                .filter(entry => (entry.type === 'Expense' || (entry.type === 'Income' && entry.categoryGroup === 'Online Payments')) && entry.categoryItem)
+                .forEach(entry => {
+                    const idx = labels.indexOf(entry.categoryItem);
+                    if (idx !== -1) data[idx] += entry.amount;
+                });
+
+            return { labels, data };
+        }
+
+        function getMonthlyCategoryComparisonData() {
+            const now = new Date();
+            const months = [];
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                months.push(d.toLocaleString('default', { month: 'short', year: 'numeric' }));
+            }
+
+            const categories = ['Zarooriat', 'Khwahishat', 'Self Growth', 'Business', 'Achanak', 'Online Payments'];
+            const datasets = categories.map((cat, idx) => ({
+                label: cat,
+                data: new Array(6).fill(0),
+                borderColor: MAIN_CATEGORY_COLORS[cat] || '#cccccc',
+                backgroundColor: 'transparent',
+                tension: 0.2
+            }));
+
+            entries.forEach(entry => {
+                if ((entry.type !== 'Expense' && !(entry.type === 'Income' && entry.categoryGroup === 'Online Payments')) || !entry.categoryGroup) return;
+                const entryDate = new Date(entry.date);
+                const monthDiff = (now.getMonth() - entryDate.getMonth()) + (12 * (now.getFullYear() - entryDate.getFullYear()));
+                if (monthDiff >= 0 && monthDiff < 6) {
+                    const index = 5 - monthDiff;
+                    const catIndex = categories.indexOf(entry.categoryGroup);
+                    if (catIndex !== -1) datasets[catIndex].data[index] += entry.amount;
+                }
+            });
+
+            return { labels: months, datasets };
+        }
+        
+        // Helper: generate a unique filename for each backup
+        function getUniqueBackupFilename() {
+            const now = new Date();
+            const pad = (n) => n.toString().padStart(2, '0');
+            const yyyy = now.getFullYear();
+            const mm = pad(now.getMonth() + 1);
+            const dd = pad(now.getDate());
+            const hh = pad(now.getHours());
+            const min = pad(now.getMinutes());
+            const ss = pad(now.getSeconds());
+            return `expense_manager_backup_${yyyy}${mm}${dd}_${hh}${min}${ss}.json`;
+        }
+
+        // IndexedDB helpers to store/retrieve directory handle
+        function saveDirectoryHandle(dirHandle) {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('fsHandleDB', 1);
+                req.onupgradeneeded = (e) => {
+                    const idb = e.target.result;
+                    if (!idb.objectStoreNames.contains('handles')) idb.createObjectStore('handles');
+                };
+                req.onsuccess = (e) => {
+                    const idb = e.target.result;
+                    const tx = idb.transaction('handles', 'readwrite');
+                    tx.objectStore('handles').put(dirHandle, 'backupDir');
+                    tx.oncomplete = () => { idb.close(); resolve(); };
+                    tx.onerror = () => { idb.close(); reject(tx.error); };
+                };
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        function getStoredDirectoryHandle() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('fsHandleDB', 1);
+                req.onupgradeneeded = (e) => {
+                    const idb = e.target.result;
+                    if (!idb.objectStoreNames.contains('handles')) idb.createObjectStore('handles');
+                };
+                req.onsuccess = (e) => {
+                    const idb = e.target.result;
+                    const tx = idb.transaction('handles', 'readonly');
+                    const getReq = tx.objectStore('handles').get('backupDir');
+                    getReq.onsuccess = () => { idb.close(); resolve(getReq.result); };
+                    getReq.onerror = () => { idb.close(); resolve(undefined); };
+                };
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function verifyWritePermission(handle) {
+            if (!handle) return false;
+            // Check for queryPermission API
+            if (handle.queryPermission) {
+                const q = await handle.queryPermission({ mode: 'readwrite' });
+                if (q === 'granted') return true;
+                const req = await handle.requestPermission({ mode: 'readwrite' });
+                return req === 'granted';
+            }
+            // If no permission API, assume writable
+            return true;
+        }
+
+        async function exportData() {
+            const data = {
+                entries: entries,
+                trash: trash,
+                lastBackup: new Date().toISOString()
+            };
+
+            const filename = getUniqueBackupFilename();
+
+            // If File System Access API is available, try to write directly to chosen folder
+            const supportsFS = 'showDirectoryPicker' in window && 'FileSystemWritableFileStream' in window;
+            if (supportsFS) {
+                try {
+                    let dirHandle = await getStoredDirectoryHandle();
+
+                    if (!dirHandle) {
+                        // Prompt user to pick a directory once
+                        dirHandle = await window.showDirectoryPicker();
+                        // Save for future use
+                        await saveDirectoryHandle(dirHandle);
+                    }
+
+                    // Verify we have write permission, otherwise request it
+                    const ok = await verifyWritePermission(dirHandle);
+                    if (!ok) {
+                        // Ask user to pick again
+                        dirHandle = await window.showDirectoryPicker();
+                        await saveDirectoryHandle(dirHandle);
+                    }
+
+                    const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+                    await writable.close();
+
+                    alert('Backup exported successfully!');
+                    return;
+                } catch (err) {
+                    console.error('File System API write failed, falling back to download. Error:', err);
+                    // fallthrough to fallback download
+                }
+            }
+
+            // Fallback: create a download anchor with a unique filename (ensures not overwriting existing file in browser downloads)
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", filename);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+
+            alert('Backup exported successfully!');
+        }
+        
+        async function changeBackupDirectory() {
+            if (!('showDirectoryPicker' in window)) {
+                alert('Changing backup folder is not supported in this browser.');
+                return;
+            }
+
+            try {
+                const dirHandle = await window.showDirectoryPicker();
+                await saveDirectoryHandle(dirHandle);
+                alert('Backup folder selected and saved successfully.');
+            } catch (err) {
+                console.error('Directory selection cancelled or failed:', err);
+                alert('Directory selection cancelled or failed.');
+            }
+        }
+
+        function saveToGoogleDrive() {
+            alert('To save to Google Drive:\n1. Click "Export to File" to download your data\n2. Upload the downloaded file to your Google Drive\n\nNote: Direct Google Drive integration requires additional setup.');
+        }
+        
+        function generateTextReport() {
+            let report = "Cash MANAGER - FINANCIAL REPORT\n";
+            report += "=====================================\n\n";
+            report += `Generated: ${new Date().toLocaleString()}\n\n`;
+            
+            // Summary section
+            report += "FINANCIAL SUMMARY\n";
+            report += "-----------------\n";
+            
+            const income = entries
+                .filter(entry => entry.type === 'Income')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const expenses = entries
+                .filter(entry => entry.type === 'Expense')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const savings = entries
+                .filter(entry => entry.type === 'Savings')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const savingsWithdrawals = entries
+                .filter(entry => entry.type === 'Savings-Withdrawal')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanGiven = entries
+                .filter(entry => entry.type === 'Loan-Given')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanTaken = entries
+                .filter(entry => entry.type === 'Loan-Taken')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanReturned = entries
+                .filter(entry => entry.type === 'Loan-Returned')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanReceived = entries
+                .filter(entry => entry.type === 'Loan-Received')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const amanatDeposit = entries
+                .filter(entry => entry.type === 'Amanat')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const amanatWithdrawal = entries
+                .filter(entry => entry.type === 'Amanat-Withdrawal')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const netSavings = savings - savingsWithdrawals;
+            const netLoanAmount = (loanTaken + loanReceived) - (loanGiven + loanReturned);
+            const netAmanat = amanatDeposit - amanatWithdrawal;
+            
+            const onlinePaymentsIncome = entries
+                .filter(entry => entry.type === 'Income' && entry.categoryGroup === 'Online Payments')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            const onlinePaymentsExpense = entries
+                .filter(entry => entry.type === 'Expense' && entry.categoryGroup === 'Online Payments')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            const netOnlinePayments = onlinePaymentsIncome - onlinePaymentsExpense;
+            
+            const balance = income - expenses - netSavings + netLoanAmount;
+            
+            report += `Total Income: $${income.toFixed(2)}\n`;
+            report += `Total Expenses: $${expenses.toFixed(2)}\n`;
+            report += `Total Savings: $${netSavings.toFixed(2)}\n`;
+            report += `Net Loan Balance: $${netLoanAmount.toFixed(2)}\n`;
+            report += `Amanat Balance: $${netAmanat.toFixed(2)}\n`;
+            report += `Online Payments Net: $${netOnlinePayments.toFixed(2)}\n`;
+            report += `Net Balance: $${balance.toFixed(2)}\n\n`;
+            
+            // Loan Details
+            report += "LOAN DETAILS\n";
+            report += "------------\n";
+            report += `Loans Given: $${loanGiven.toFixed(2)}\n`;
+            report += `Loans Taken: $${loanTaken.toFixed(2)}\n`;
+            report += `Loans Returned: $${loanReturned.toFixed(2)}\n`;
+            report += `Loans Received: $${loanReceived.toFixed(2)}\n`;
+            report += `Net Loan: $${netLoanAmount.toFixed(2)}\n\n`;
+            
+            // Amanat Details
+            report += "AMANAT DETAILS\n";
+            report += "--------------\n";
+            report += `Amanat Deposits: $${amanatDeposit.toFixed(2)}\n`;
+            report += `Amanat Withdrawals: $${amanatWithdrawal.toFixed(2)}\n`;
+            report += `Net Amanat: $${netAmanat.toFixed(2)}\n\n`;
+            
+            // Category-wise breakdown
+            report += "EXPENSE BY MAIN CATEGORY\n";
+            report += "------------------------\n";
+            
+            const mainCategories = ['Zarooriat', 'Khwahishat', 'Self Growth', 'Business', 'Achanak', 'Online Payments'];
+            mainCategories.forEach(category => {
+                const total = entries
+                    .filter(entry => entry.type === 'Expense' && entry.categoryGroup === category)
+                    .reduce((sum, entry) => sum + entry.amount, 0);
+                
+                if (total > 0) {
+                    const percentage = expenses > 0 ? ((total / expenses) * 100).toFixed(1) : '0.0';
+                    report += `${category}: $${total.toFixed(2)} (${percentage}%)\n`;
+                }
+            });
+            
+            // Recent transactions
+            report += "\nRECENT TRANSACTIONS (Last 20)\n";
+            report += "----------------------------\n";
+            
+            const recentEntries = [...entries]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 20);
+            
+            recentEntries.forEach(entry => {
+                const date = new Date(entry.date).toLocaleDateString();
+                const sign = entry.type === 'Income' || entry.type === 'Savings-Withdrawal' || 
+                            entry.type === 'Loan-Taken' || entry.type === 'Loan-Received' ||
+                            entry.type === 'Amanat-Withdrawal' ? '+' : '-';
+                report += `${date} | ${getDisplayType(entry.type).padEnd(15)} | ${entry.personName ? entry.personName.padEnd(15) : '-'.padEnd(15)} | ${sign}$${entry.amount.toFixed(2).padStart(10)} | ${entry.categoryGroup || '-'} | ${entry.categoryItem || '-'} | ${entry.note || ''}\n`;
+            });
+            
+            // Monthly breakdown
+            report += "\nMONTHLY BREAKDOWN (Last 6 Months)\n";
+            report += "---------------------------------\n";
+            
+            const monthlyData = getMonthlyData();
+            monthlyData.labels.forEach((month, index) => {
+                report += `${month}: Income: $${monthlyData.income[index].toFixed(2)}, Expenses: $${monthlyData.expenses[index].toFixed(2)}\n`;
+            });
+            
+            // Savings details
+            report += "\nSAVINGS DETAILS\n";
+            report += "--------------\n";
+            report += `Total Deposits: $${savings.toFixed(2)}\n`;
+            report += `Total Withdrawals: $${savingsWithdrawals.toFixed(2)}\n`;
+            report += `Net Savings: $${netSavings.toFixed(2)}\n\n`;
+            
+            report += "=====================================\n";
+            report += "End of Report\n";
+            
+            // Download as .txt file
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `expense_report_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        async function deleteSelectedEntries() {
+            const checkboxes = document.querySelectorAll('.entry-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one entry to delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${checkboxes.length} selected entries?`)) {
+                for (const checkbox of checkboxes) {
+                    const id = parseInt(checkbox.dataset.id);
+                    await deleteEntry(id);
+                }
+            }
+        }
+        
+        async function restoreSelectedEntries() {
+            const checkboxes = document.querySelectorAll('.trash-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one entry to restore.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to restore ${checkboxes.length} selected entries?`)) {
+                for (const checkbox of checkboxes) {
+                    const id = parseInt(checkbox.dataset.id);
+                    await restoreEntry(id);
+                }
+            }
+        }
+        
+        async function permanentDeleteSelectedEntries() {
+            const checkboxes = document.querySelectorAll('.trash-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one entry to permanently delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to permanently delete ${checkboxes.length} selected entries? This cannot be undone.`)) {
+                for (const checkbox of checkboxes) {
+                    const id = parseInt(checkbox.dataset.id);
+                    await permanentDelete(id);
+                }
+            }
+        }
+        
+        async function emptyTrash() {
+            if (trash.length === 0) {
+                alert('Trash is already empty!');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to permanently delete ALL items in the trash? This cannot be undone.')) {
+                trash = [];
+                await saveData();
+                renderTrash();
+                alert('Trash has been emptied successfully!');
+            }
+        }
+        
+        function addSampleData() {
+            const today = new Date();
+            const lastMonth = new Date(today);
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            
+            entries = [
+                { id: 1, amount: 5000, categoryGroup: '', categoryItem: 'Salary', type: 'Income', date: today.toISOString().split('T')[0], note: 'Monthly Salary', personName: '' },
+                { id: 2, amount: 1800, categoryGroup: 'Zarooriat', categoryItem: 'Home / Rent', type: 'Expense', date: today.toISOString().split('T')[0], note: 'Apartment Rent', personName: '' },
+                { id: 3, amount: 350, categoryGroup: 'Zarooriat', categoryItem: 'Rashan (Groceries)', type: 'Expense', date: today.toISOString().split('T')[0], note: 'Groceries', personName: '' },
+                { id: 4, amount: 250, categoryGroup: 'Khwahishat', categoryItem: 'Shopping', type: 'Expense', date: today.toISOString().split('T')[0], note: 'Shopping', personName: '' },
+                { id: 5, amount: 150, categoryGroup: 'Zarooriat', categoryItem: 'Transport (Fuel, Bus, Careem, Bike)', type: 'Expense', date: lastMonth.toISOString().split('T')[0], note: 'Gas and Parking', personName: '' },
+                { id: 6, amount: 200, categoryGroup: 'Khwahishat', categoryItem: 'Entertainment (Movies, Netflix, Games)', type: 'Expense', date: lastMonth.toISOString().split('T')[0], note: 'Entertainment', personName: '' },
+                { id: 7, amount: 120, categoryGroup: 'Zarooriat', categoryItem: 'Health / Medicine', type: 'Expense', date: lastMonth.toISOString().split('T')[0], note: 'Medicines', personName: '' },
+                { id: 8, amount: 450, categoryGroup: 'Self Growth', categoryItem: 'Books', type: 'Expense', date: lastMonth.toISOString().split('T')[0], note: 'Books purchase', personName: '' },
+                { id: 9, amount: 1000, categoryGroup: '', categoryItem: '', type: 'Savings', date: today.toISOString().split('T')[0], note: 'Monthly Savings Deposit', personName: '' },
+                { id: 10, amount: 500, categoryGroup: '', categoryItem: '', type: 'Loan-Given', date: today.toISOString().split('T')[0], note: 'Loan to John', personName: 'John Doe' },
+                { id: 11, amount: 300, categoryGroup: '', categoryItem: '', type: 'Loan-Taken', date: today.toISOString().split('T')[0], note: 'Loan from Alex', personName: 'Alex Smith' },
+                { id: 12, amount: 200, categoryGroup: '', categoryItem: '', type: 'Amanat', date: today.toISOString().split('T')[0], note: 'Amanat from Sara', personName: 'Sara Khan' },
+                { id: 13, amount: 75, categoryGroup: 'Online Payments', categoryItem: 'JazzCash', type: 'Expense', date: today.toISOString().split('T')[0], note: 'Mobile recharge', personName: '' },
+                { id: 14, amount: 150, categoryGroup: 'Online Payments', categoryItem: 'Easypaisa', type: 'Income', date: today.toISOString().split('T')[0], note: 'Received payment', personName: '' }
+            ];
+            
+            saveData();
+            updateDashboard();
+            renderEntries();
+            renderTrash();
+            initCharts();
+        }
+        
+        // Create file input for import
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.style.display = 'none';
+        fileInput.id = 'fileInput';
+        fileInput.addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // Helper to map various backup formats into current entry shape
+                    function mapImportedEntry(en) {
+                        const id = en.id || (Date.now() + Math.floor(Math.random() * 1000));
+                        const amount = typeof en.amount === 'string' ? parseFloat(en.amount) : (en.amount || 0);
+                        const categoryGroup = en.categoryGroup ?? en.mainCategory ?? en.main_category ?? '';
+                        const categoryItem = en.categoryItem ?? en.subCategory ?? en.sub_category ?? '';
+                        const type = en.type || 'Expense';
+                        const date = en.date || new Date().toISOString().split('T')[0];
+                        const note = en.note || '';
+                        const personName = en.personName ?? en.person ?? '';
+
+                        return {
+                            id,
+                            amount,
+                            categoryGroup,
+                            categoryItem,
+                            type,
+                            date,
+                            note,
+                            personName
+                        };
+                    }
+
+                    let importedEntries = [];
+                    let importedTrash = [];
+
+                    if (Array.isArray(data.entries)) {
+                        importedEntries = data.entries.map(mapImportedEntry);
+                        if (Array.isArray(data.trash)) importedTrash = data.trash.map(mapImportedEntry);
+                    } else if (Array.isArray(data)) {
+                        // Some backups might be a raw array of entries
+                        importedEntries = data.map(mapImportedEntry);
+                    } else if (Array.isArray(data.backup) && data.backup.length) {
+                        importedEntries = data.backup.map(mapImportedEntry);
+                    } else {
+                        alert('Invalid backup file format.');
+                        return;
+                    }
+
+                    // Merge into existing entries/trash, avoiding simple ID collisions
+                    const existingIds = new Set(entries.map(en => en.id));
+                    for (const im of importedEntries) {
+                        if (!existingIds.has(im.id)) {
+                            entries.push(im);
+                            existingIds.add(im.id);
+                        } else {
+                            // assign a fresh id to avoid overwrite
+                            im.id = Date.now() + Math.floor(Math.random() * 100000) + Math.floor(Math.random() * 1000);
+                            entries.push(im);
+                        }
+                    }
+
+                    const existingTrashIds = new Set(trash.map(t => t.id));
+                    for (const imt of importedTrash) {
+                        if (!existingTrashIds.has(imt.id)) trash.push(imt);
+                    }
+
+                    await saveData();
+                    updateDashboard();
+                    renderEntries();
+                    renderTrash();
+                    initCharts();
+                    alert('Data imported successfully!');
+                } catch (error) {
+                    alert('Error reading backup file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+        document.body.appendChild(fileInput);
+
+        document.getElementById("backupBtn").addEventListener("click", function () {
+            document.querySelector(".backup-section").scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+
+        // Re-render when window resizes (to switch between table and cards)
+        window.addEventListener('resize', () => {
+            renderEntries();
+            renderTrash();
+        });
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            
+            // Update footer date
+            const currentDate = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = currentDate.toLocaleDateString('en-US', options);
+            
+            // Set default type to Expense
+            typeSelect.value = 'Expense';
+            
+            // Hide person name group initially
+            personNameGroup.style.display = 'none';
+            
+            // Set theme based on preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            }
+            
+            // Initialize IndexedDB
+            await initDB();
+            
+            // Load entries and update UI
+            updateDashboard();
+            renderEntries();
+            renderTrash();
+            initCharts();
+            
+            // Set up event listeners
+            setupEventListeners();
+            // Populate category items for current selection (if any)
+            populateCategoryItems(categoryGroupSelect.value);
+            
+            // Add sample data for first-time users if no data exists
+            if (entries.length === 0 && trash.length === 0) {
+                addSampleData();
+            }
+        });
+        
+        function setupEventListeners() {
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Reset all data
+            resetAll.addEventListener('click', resetAllData);
+            
+            // Form submission
+            entryForm.addEventListener('submit', handleFormSubmit);
+            
+            // Toggle trash visibility
+            toggleTrash.addEventListener('click', () => {
+                trashContent.classList.toggle('show');
+                toggleTrash.innerHTML = trashContent.classList.contains('show') ? 
+                    '<i class="fas fa-chevron-up"></i> Hide Trash' : 
+                    '<i class="fas fa-chevron-down"></i> Show Trash';
+            });
+            
+            // Type change handling - show category fields for Income so user can select Online Payments
+            typeSelect.addEventListener('change', function() {
+                const categoryGroupGroup = document.querySelector('.category-group');
+                const categoryItemGroup = document.querySelector('.category-item-group');
+
+                if (this.value === 'Income') {
+                    // Show category fields to allow selection of Online Payments or other categories
+                    categoryGroupGroup.style.display = 'block';
+                    categoryItemGroup.style.display = 'block';
+                    personNameGroup.style.display = 'none';
+                } else if (this.value === 'Savings' || this.value === 'Savings-Withdrawal') {
+                    categoryGroupGroup.style.display = 'none';
+                    categoryItemGroup.style.display = 'none';
+                    personNameGroup.style.display = 'none';
+                } else if (this.value.includes('Loan') || this.value.includes('Amanat')) {
+                    categoryGroupGroup.style.display = 'none';
+                    categoryItemGroup.style.display = 'none';
+                    personNameGroup.style.display = 'block';
+                } else {
+                    categoryGroupGroup.style.display = 'block';
+                    categoryItemGroup.style.display = 'block';
+                    personNameGroup.style.display = 'none';
+                }
+            });
+            
+            // Category group change: populate items and also handle Income visibility
+            categoryGroupSelect.addEventListener('change', function() {
+                populateCategoryItems(this.value);
+                // If type is Income and this category is selected, ensure fields are visible
+                if (typeSelect.value === 'Income') {
+                    document.querySelector('.category-group').style.display = 'block';
+                    document.querySelector('.category-item-group').style.display = 'block';
+                }
+            });
+            
+            // Filtering and search
+            searchBtn.addEventListener('click', () => {
+                currentPage = 1;
+                renderEntries();
+            });
+            searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    currentPage = 1;
+                    renderEntries();
+                }
+            });
+            startDate.addEventListener('change', () => {
+                currentPage = 1;
+                renderEntries();
+            });
+            endDate.addEventListener('change', () => {
+                currentPage = 1;
+                renderEntries();
+            });
+            filterCategory.addEventListener('change', () => {
+                currentPage = 1;
+                renderEntries();
+            });
+            
+            // Backup and restore
+            exportBtn.addEventListener('click', exportData);
+            if (changeBackupBtn) changeBackupBtn.addEventListener('click', changeBackupDirectory);
+            importBtn.addEventListener('click', () => document.getElementById('fileInput')?.click());
+            saveToDriveBtn.addEventListener('click', saveToGoogleDrive);
+            generateReportBtn.addEventListener('click', generateTextReport);
+            
+            // Bulk actions
+            deleteSelectedBtn.addEventListener('click', deleteSelectedEntries);
+            restoreSelectedBtn.addEventListener('click', restoreSelectedEntries);
+            permanentDeleteSelectedBtn.addEventListener('click', permanentDeleteSelectedEntries);
+            emptyTrashBtn.addEventListener('click', emptyTrash);
+            
+            // Select all checkboxes
+            selectAllEntries.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.entry-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+            
+            selectAllTrash.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.trash-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            } else {
+                localStorage.setItem('darkMode', null);
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            }
+            
+            // Re-render charts to update colors
+            initCharts();
+        }
+        
+        async function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL data? This cannot be undone.')) {
+                // Clear IndexedDB
+                if (db) {
+                    const tx = db.transaction([STORE_ENTRIES, STORE_TRASH], 'readwrite');
+                    tx.objectStore(STORE_ENTRIES).clear();
+                    tx.objectStore(STORE_TRASH).clear();
+                }
+                
+                // Clear localStorage
+                localStorage.removeItem('expenseEntries');
+                localStorage.removeItem('expenseTrash');
+                
+                entries = [];
+                trash = [];
+                
+                updateDashboard();
+                renderEntries();
+                renderTrash();
+                initCharts();
+                alert('All data has been reset successfully!');
+            }
+        }
+        
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('amount').value);
+            const categoryGroup = document.getElementById('categoryGroup').value;
+            const categoryItem = document.getElementById('categoryItem').value;
+            const type = document.getElementById('type').value;
+            const date = document.getElementById('date').value;
+            const note = document.getElementById('note').value;
+            const personName = document.getElementById('personName').value;
+            
+            if (amount <= 0) {
+                alert('Amount must be greater than 0');
+                return;
+            }
+            
+            if ((type.includes('Loan') || type.includes('Amanat')) && !personName.trim()) {
+                alert('Please enter person name for loan/amanat entries');
+                return;
+            }
+            
+            let finalCategoryGroup = categoryGroup;
+            let finalCategoryItem = categoryItem;
+            if (type === 'Income') {
+                if (categoryGroup === 'Online Payments') {
+                    finalCategoryGroup = 'Online Payments';
+                    finalCategoryItem = categoryItem;
+                } else {
+                    // Regular income (like salary) - no category group, item set to Salary
+                    finalCategoryGroup = '';
+                    finalCategoryItem = 'Salary';
+                }
+            } else if (type === 'Savings' || type === 'Savings-Withdrawal' || type.includes('Loan') || type.includes('Amanat')) {
+                finalCategoryGroup = '';
+                finalCategoryItem = '';
+            }
+            
+            if (editingId !== null) {
+                // Update existing entry
+                entries = entries.map(entry => {
+                    if (entry.id === editingId) {
+                        return {
+                            ...entry,
+                            amount,
+                            categoryGroup: finalCategoryGroup,
+                            categoryItem: finalCategoryItem,
+                            type,
+                            date,
+                            note,
+                            personName: type.includes('Loan') || type.includes('Amanat') ? personName : ''
+                        };
+                    }
+                    return entry;
+                });
+                
+                editingId = null;
+                document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-save"></i> Add Entry';
+            } else {
+                // Create new entry
+                const newEntry = {
+                    id: Date.now(),
+                    amount,
+                    categoryGroup: finalCategoryGroup,
+                    categoryItem: finalCategoryItem,
+                    type,
+                    date,
+                    note,
+                    personName: type.includes('Loan') || type.includes('Amanat') ? personName : ''
+                };
+                
+                entries.push(newEntry);
+            }
+            
+            // Save to storage
+            await saveData();
+            
+            // Reset form
+            entryForm.reset();
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            typeSelect.value = 'Expense';
+            categoryGroupSelect.value = '';
+            categoryItemSelect.innerHTML = '<option value="">Select Item</option>';
+            personNameGroup.style.display = 'none';
+            // Reset category fields visibility based on type (now Expense)
+            document.querySelector('.category-group').style.display = 'block';
+            document.querySelector('.category-item-group').style.display = 'block';
+            
+            // Update UI
+            updateDashboard();
+            renderEntries();
+            initCharts();
+        }
+        
+        function updateDashboard() {
+            const income = entries
+                .filter(entry => entry.type === 'Income')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const expenses = entries
+                .filter(entry => entry.type === 'Expense')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const savings = entries
+                .filter(entry => entry.type === 'Savings')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const savingsWithdrawals = entries
+                .filter(entry => entry.type === 'Savings-Withdrawal')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanGiven = entries
+                .filter(entry => entry.type === 'Loan-Given')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanTaken = entries
+                .filter(entry => entry.type === 'Loan-Taken')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanReturned = entries
+                .filter(entry => entry.type === 'Loan-Returned')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const loanReceived = entries
+                .filter(entry => entry.type === 'Loan-Received')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const amanatDeposit = entries
+                .filter(entry => entry.type === 'Amanat')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const amanatWithdrawal = entries
+                .filter(entry => entry.type === 'Amanat-Withdrawal')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            
+            const netSavings = savings - savingsWithdrawals;
+            const netLoanAmount = (loanTaken + loanReceived) - (loanGiven + loanReturned);
+            const netAmanat = amanatDeposit - amanatWithdrawal;
+            
+            // Online Payments net balance (Income - Expense within Online Payments category)
+            const onlinePaymentsIncome = entries
+                .filter(entry => entry.type === 'Income' && entry.categoryGroup === 'Online Payments')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            const onlinePaymentsExpense = entries
+                .filter(entry => entry.type === 'Expense' && entry.categoryGroup === 'Online Payments')
+                .reduce((sum, entry) => sum + entry.amount, 0);
+            const netOnlinePayments = onlinePaymentsIncome - onlinePaymentsExpense;
+            
+            // Net Balance: Income - Expenses - NetSavings + NetLoan  (Amanat is excluded)
+            const balance = income - expenses - netSavings + netLoanAmount;
+            
+            totalIncome.textContent = income.toFixed(2);
+            totalExpenses.textContent = expenses.toFixed(2);
+            totalSavings.textContent = netSavings.toFixed(2);
+            netLoan.textContent = netLoanAmount.toFixed(2);
+            amanatBalance.textContent = netAmanat.toFixed(2);
+            onlinePaymentsBalance.textContent = netOnlinePayments.toFixed(2);
+            remainingBalance.textContent = balance.toFixed(2);
+        }
+</script>
+
+    <!-- Minimal mobile tab switcher (does not affect desktop) -->
+    <script>
+        (function() {
+            if (window.innerWidth > 768) return;
+            const tabs = document.querySelectorAll('.mobile-tab');
+            const sections = document.querySelectorAll('.tab-section');
+            function setActiveTab(tabId) {
+                sections.forEach(s => {
+                    if (tabId === 'dashboard' && s.id === 'dashboard-section') s.style.display = 'block';
+                    else if (tabId === 'entries' && (s.id === 'form-section' || s.id === 'entries-section')) s.style.display = 'block';
+                    else if (tabId === 'search' && (s.id === 'controls-section' || s.id === 'entries-section')) s.style.display = 'block';
+                    else if (tabId === 'analytics' && (s.id === 'charts-section' || s.id === 'chart-detail-section')) s.style.display = 'block';
+                    else if (tabId === 'trash' && s.id === 'trash-section') s.style.display = 'block';
+                    else if (tabId === 'backup' && s.id === 'backup-section') s.style.display = 'block';
+                    else s.style.display = 'none';
+                });
+            }
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const active = tab.getAttribute('data-tab');
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    setActiveTab(active);
+                });
+            });
+            setActiveTab('dashboard');
+            document.getElementById('mobileResetBtn')?.addEventListener('click', () => document.getElementById('resetAll').click());
+            document.getElementById('mobileThemeToggleBtn')?.addEventListener('click', () => document.getElementById('themeToggle').click());
+            document.getElementById('mobileReportBtn')?.addEventListener('click', () => document.getElementById('generateReport').click());
+            document.getElementById('mobileBackupBtn')?.addEventListener('click', () => document.querySelector('.backup-section').scrollIntoView({ behavior: 'smooth' }));
+        })();
+    </script>
+
+    <script src="./js/chart.js"></script>
+    <script src="./js/all.min.js"></script>
+
+</body>
+</html>
