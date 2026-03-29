@@ -3021,7 +3021,18 @@
             document.getElementById('mobileResetBtn')?.addEventListener('click', () => document.getElementById('resetAll').click());
             document.getElementById('mobileThemeToggleBtn')?.addEventListener('click', () => document.getElementById('themeToggle').click());
             document.getElementById('mobileReportBtn')?.addEventListener('click', () => document.getElementById('generateReport').click());
-            document.getElementById('mobileBackupBtn')?.addEventListener('click', () => document.querySelector('.backup-section').scrollIntoView({ behavior: 'smooth' }));
+document.getElementById('mobileBackupBtn')?.addEventListener('click', () => {
+    // backup tab active karo
+    tabs.forEach(t => t.classList.remove('active'));
+    const backupTab = document.querySelector('.mobile-tab[data-tab="backup"]');
+    if (backupTab) backupTab.classList.add('active');
+
+    // tab switch function call karo
+    setActiveTab('backup');
+
+    // scroll bhi kar do
+    document.getElementById('backup-section').scrollIntoView({ behavior: 'smooth' });
+});
         })();
     </script>
 
