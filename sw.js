@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cash-manager-v2'; // version update kiya
+const CACHE_NAME = 'cash-manager-v3'; // version update kiya
 const urlsToCache = [
   './',
   './index.html',
